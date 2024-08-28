@@ -88,7 +88,6 @@ module password_check (
     // input admin_buttion,  // clear the alarm signal, posedge trigger
     output result // '1': right '0': wrong 
 );
-if 
 
     /*TODO:          
         check the password;        
@@ -108,18 +107,17 @@ endmodule
 module decoder (   // read the 16 bits in the register, do a binary-to-dec transition
     input[16:0] bits,
     input  correct,
+    input clk,
     output reg [7:0] sel,  // select the digit you want to display
-    output reg [7:0] tubes, //
-    wire   [3:0] A,A1,A2,A3,
-    wire A4,
+    output reg [7:0] tubes //
     ); // the 4-bit binary number to display
-
+    wire   [3:0] A,A1,A2,A3;
     assign A=bits[3:0];
     assign A1=bits[7:4];
     assign A2=bits[11:8];
     assign A3=bits[15:12];
-    assign A4=correct,
-always @(A)
+    assign A4=correct;
+always @(posedge clk)
 begin
 sel <= 8'b11111110; //one tubes to display the first decimal digit
 case(A)
@@ -135,9 +133,7 @@ case(A)
 4'b1001 : tubes <= 7'b0010_000;//7'b1101_111;
 default : tubes <= 7'b1000_000;//7'b0111_111;
 endcase
-end
-always @(A1)
-begin
+
 sel <= 8'b11111101; //two tubes to display the second decimal digit
 case(A1)
 4'b0000 : tubes <= 7'b1000_000;//7'b0111_111;//
@@ -152,9 +148,9 @@ case(A1)
 4'b1001 : tubes <= 7'b0010_000;//7'b1101_111;
 default : tubes <= 7'b1000_000;//7'b0111_111;
 endcase
-end
-always @(A2)
-begin
+
+
+
 sel <= 8'b11111011; //three tubes to display the third decimal digit
 case(A2)
 4'b0000 : tubes <= 7'b1000_000;//7'b0111_111;//
@@ -169,9 +165,9 @@ case(A2)
 4'b1001 : tubes <= 7'b0010_000;//7'b1101_111;
 default : tubes <= 7'b1000_000;//7'b0111_111;
 endcase
-end
-always @(A3)
-begin
+
+
+
 sel <= 8'b11110111; //four tubes to display the third decimal digit
 case(A3)
 4'b0000 : tubes <= 7'b1000_000;//7'b0111_111;//
@@ -184,14 +180,6 @@ case(A3)
 4'b0111 : tubes <= 7'b1111_000;//7'b0000_111;
 4'b1000 : tubes <= 7'b0000_000;//7'b1111_111;
 4'b1001 : tubes <= 7'b0010_000;//7'b1101_111;
-default : tubes <= 7'b1000_000;//7'b0111_111;
-
-always @(A4)
-begin
-sel <= 8'b11101111; //four tubes to display the third decimal digit
-case(A4)
-1'b0 : tubes <= 7'b1000_000;//7'b0111_111;//
-1'b1 : tubes <= 7'b1111_001;//7'b0000_110;
 default : tubes <= 7'b1000_000;//7'b0111_111;
 endcase
 end
@@ -271,12 +259,7 @@ end
         .bits  (q  ),
         .sel   (sel   ),
         .tubes (tubes ),
-        .A     (A     ),
-        .A1    (A1    ),
-        .A2    (A2    ),
-        .A3    (A3    ),
-        .A4    (A4    ),
-        .correct(check_result),
+        .correct(check_result)
     );
     
 
