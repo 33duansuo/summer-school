@@ -117,7 +117,7 @@ module password_reg(
  begin
  if(identity==1) // user
  begin
- if(sel==8'b11111110)
+  if(sel==8'b11111110)
   begin
         case(q[3:0])
             4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
@@ -184,11 +184,15 @@ module password_reg(
     default : tubesreg <= 7'b1000_000;//7'b0111_111;
     endcase
     end
-    if(sel==8'b11101111||sel==8'b11011111||sel==8'b10111111||sel==8'b01111111)
+    if(sel==8'b11101111)
     begin
-    tubesreg <= 7'b1000_000;
+      tubesreg <= 7'b1111_001;//user
     end
+    if(sel==8'b11011111||sel==8'b10111111||sel==8'b01111111)
+    begin
+      tubesreg <= 7'b1000_000;
     end
+ end
 
     if(identity==0) // admin
     begin
@@ -259,7 +263,15 @@ module password_reg(
     default : tubesreg <= 7'b1000_000;//7'b0111_111;
     endcase
     end
-    if(sel==8'b11101111||sel==8'b11011111||sel==8'b10111111||sel==8'b01111111)
+    if(sel==8'b11101111)
+
+    begin
+
+    tubesreg <= 7'b1000_000;//admin
+
+    end
+
+    if(sel==8'b11011111||sel==8'b10111111||sel==8'b01111111)
     begin
     tubesreg <= 7'b1000_000;
     end
@@ -275,14 +287,17 @@ module password_check (
     input  [15:0] q,    // the password you input
     input  [15:0] correct_pswd, // the correct password 
     // input admin_buttion,  // clear the alarm signal, posedge trigger
-    output reg result // '1': right '0': wrong 
+    output reg result, // '1': right '0': wrong
+    output reg [3:0]LEDs 
 );
 always @(posedge ok_signal) 
 begin
   if (q==correct_pswd && identity==1) // user
     result <= 1'b1; // right
-  else if (q!=correct_pswd && identity==1) // user
+    LEDs <= 4'b0011; // two LEDs on
+  if (q!=correct_pswd && identity==1) // user
     result <= 1'b0; // wrong
+    LEDs <= 4'b1111; // all LEDs off
 end
 
 
@@ -293,7 +308,7 @@ end
 endmodule
 
 /* module password_set (  // set the password
-    input identity,   // user'1' / admin '0' , only when identity==0 will this module be enabled 
+    input identity,   // user'1'  admin '0' , only when identity==0 will this module be enabled 
     input ok_signal,  // when posedge, set the password
     input wire  [15:0] q,
     output reg [15:0] new_pswd
@@ -383,7 +398,8 @@ end
         .ok_signal(ok_button),
         .q(password),
         .correct_pswd(correct_pswd),
-        .result(check_result)
+        .result(check_result),
+        .LEDs(LEDs)
     );
     counter count(
         .error_signal(check_result),
