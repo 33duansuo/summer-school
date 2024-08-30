@@ -19,13 +19,14 @@
     <Object name="&lt;const0>_1" gui_info="hw_vios/hw_vio_1=2"/>
     <Object name="&lt;const0>_2" gui_info="hw_vios/hw_vio_1=0"/>
     <Object name="LEDs_OBUF[3:0]" gui_info="hw_vios/hw_vio_1=0"/>
-    <Object name="correct_pswd[15:0]" gui_info="hw_vios/hw_vio_1=3"/>
+    <Object name="correct_pswd[15:0]" gui_info="hw_vios/hw_vio_1=2"/>
     <Object name="identity" gui_info="hw_vios/hw_vio_1=2"/>
     <Object name="one_digit" gui_info="hw_vios/hw_vio_1=3"/>
     <Object name="password[15:0]" gui_info="hw_vios/hw_vio_1=0"/>
     <Object name="pswd_reg/left_shift[3:0]" gui_info="hw_vios/hw_vio_1=1_exp"/>
     <Object name="pswd_reg/one_digit[3:0]" gui_info="hw_vios/hw_vio_1=0_exp"/>
     <Object name="switches_IBUF[3:0]" gui_info="hw_vios/hw_vio_1=0"/>
+    <Object name="time_of_error[1:0]" gui_info="hw_vios/hw_vio_1=3_exp"/>
     <Object name="tubes_OBUF[6:0]" gui_info="hw_vios/hw_vio_1=1"/>
     <Object name="tubes_temp[6:0]" gui_info="hw_vios/hw_vio_1=3_exp"/>
   </ObjectList>
@@ -270,7 +271,7 @@
         <net name="pswd_reg/vio/probe_in3[0]"/>
       </nets>
     </probe>
-    <probe type="vio_input" busType="bus" source="netlist" spec="VIO_INPUT_V2_RT">
+    <probe type="vio_input" busType="net" source="netlist" spec="VIO_INPUT_V2_RT">
       <probeOptions Id="DebugProbeParams">
         <Option Id="ACTIVITY_PERSISTENCE" value="SHORT"/>
         <Option Id="DISPLAY_HINT" value=""/>
@@ -286,6 +287,22 @@
         <net name="switches_IBUF[2]"/>
         <net name="switches_IBUF[1]"/>
         <net name="switches_IBUF[0]"/>
+      </nets>
+    </probe>
+    <probe type="vio_input" busType="bus" source="netlist" spec="VIO_INPUT_V2_RT">
+      <probeOptions Id="DebugProbeParams">
+        <Option Id="ACTIVITY_PERSISTENCE" value="SHORT"/>
+        <Option Id="DISPLAY_HINT" value=""/>
+        <Option Id="DISPLAY_VISIBILITY" value=""/>
+        <Option Id="HW_VIO" value="hw_vio_1"/>
+        <Option Id="INPUT_VALUE_RADIX" value="HEX"/>
+        <Option Id="NAME.CUSTOM" value=""/>
+        <Option Id="NAME.SELECT" value="Long"/>
+        <Option Id="SOURCE" value="netlist"/>
+      </probeOptions>
+      <nets>
+        <net name="time_of_error[1]"/>
+        <net name="time_of_error[0]"/>
       </nets>
     </probe>
     <probe type="vio_input" busType="bus" source="netlist" spec="VIO_INPUT_V2_RT">

@@ -55,8 +55,8 @@ COMPONENT vio_0
   PORT (
     clk : IN STD_LOGIC;
     probe_in0 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-    probe_in1 : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-    probe_in2 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    probe_in1 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+    probe_in2 : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
     probe_in3 : IN STD_LOGIC_VECTOR(6 DOWNTO 0) 
   );
 END COMPONENT;

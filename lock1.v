@@ -20,8 +20,7 @@ module password_reg(
     input edit_switch, // toggle it before entering password 
     input load, // to load one digit (left-shift), posedge trigger
 	input[3:0] one_digit, // the one decimal digit you input
-    //input ok,     // press (=0) it when you finish entering
-    //output ok_signal, // to the system logic
+    input[1:0] time_of_error,
     output reg [15:0] q, // the shift reg that loads password
     output reg [15:0] new_pswd, // the new password you set,when"identity==0"
     output reg [6:0] tubesreg, // the tubes to display the first decimal digit
@@ -35,27 +34,27 @@ module password_reg(
         if(left_shift==0 && one_digit<10)
             left_shift <= 1;
         
-        if(left_shift==1 && one_digit<10)
+        else if(left_shift==1 && one_digit<10)
             left_shift <= 2;
 
         
-        if(left_shift==2 && one_digit<10)
+        else if(left_shift==2 && one_digit<10)
             left_shift <= 3;
 
         
-        if(left_shift==3 && one_digit<10)
+        else if(left_shift==3 && one_digit<10)
             left_shift <= 0;
         
-        if(left_shift==3 && one_digit>=10)
+        else if(left_shift==3 && one_digit>=10)
             left_shift <= 2;
         
-        if(left_shift==2 && one_digit>=10)
+        else if(left_shift==2 && one_digit>=10)
             left_shift <= 1;
         
-        if(left_shift==1 && one_digit>=10)
+        else if(left_shift==1 && one_digit>=10)
             left_shift <= 0;
         
-        if(left_shift==0 && one_digit>=10)
+        else if(left_shift==0 && one_digit>=10)
             left_shift <= 3;
     end
 
@@ -66,13 +65,13 @@ module password_reg(
             if(left_shift==0)
                 q[3:0] <= one_digit;
             
-            if(left_shift==1)    
+            else if(left_shift==1)    
                 q[7:4] <= one_digit;
                
-            if(left_shift==2)    
+            else if(left_shift==2)    
                 q[11:8] <= one_digit;
                     
-            if(left_shift==3)           
+            else if(left_shift==3)           
                 q[15:12] <= one_digit;
     end
 
@@ -188,7 +187,18 @@ module password_reg(
     begin
       tubesreg <= 7'b1111_001;//user
     end
-    if(sel==8'b11011111||sel==8'b10111111||sel==8'b01111111)
+    if(sel==8'b11011111)
+    begin
+    case(time_of_error[1:0])
+    2'b00 : tubesreg <= 7'b1000_000;//7'b0111_111;//
+    2'b01 : tubesreg <= 7'b1111_001;//7'b0000_110;
+    2'b10 : tubesreg <= 7'b0100_100;//7'b1011_011;
+    2'b11 : tubesreg <= 7'b0110_000;//7'b1001_111;
+    default : tubesreg <= 7'b1000_000;//7'b0111_111;
+    endcase
+    end
+
+    if(sel==8'b10111111||sel==8'b01111111)
     begin
       tubesreg <= 7'b1000_000;
     end
@@ -284,20 +294,32 @@ endmodule
 module password_check (
     input identity,  // user'1' / admin '0' , only when identity==1 will this module be enabled
     input ok_signal, // when posedge, check the password
-    input  [15:0] q,    // the password you input
+    input  [15:0] password,    // the password you input
     input  [15:0] correct_pswd, // the correct password 
     // input admin_buttion,  // clear the alarm signal, posedge trigger
     output reg result, // '1': right '0': wrong
-    output reg [3:0]LEDs 
+    output reg [3:0]LEDs,
+    output reg [1:0]time_of_error 
 );
 always @(posedge ok_signal) 
 begin
-  if (q==correct_pswd && identity==1) // user
+  if (password==correct_pswd && identity==1) // user
+  begin
     result <= 1'b1; // right
     LEDs <= 4'b0011; // two LEDs on
-  if (q!=correct_pswd && identity==1) // user
+    time_of_error <= 2'b00; // no error
+  end
+  else if (password!=correct_pswd && identity==1) // user
+  begin
     result <= 1'b0; // wrong
     LEDs <= 4'b1111; // all LEDs off
+    time_of_error <= time_of_error+2'b01; // error happened
+  end
+  else if (identity==0) // admin
+  begin
+    LEDs <= 4'b0000; //
+    time_of_error <= 2'b00; // no error
+  end
 end
 
 
@@ -316,14 +338,14 @@ endmodule
     
 //endmodule
 
-module counter (
+/* module counter (
     input error_signal,
     output[1:0] count // 
-);
+); */
     /*TODO:
     implement a counter that counts the time you enter the wrong password
     */
-endmodule
+
 
 module system_logic (  // manages the overall logic of the lock, **it should be the top module**
     input clk, // the clock signal
@@ -346,6 +368,7 @@ module system_logic (  // manages the overall logic of the lock, **it should be 
     reg identity = 1'b1; // 0-admin, 1-user
     wire load_button;
     wire admin_temp;
+    wire ok_signal;
     parameter waiting = 2'b00;
     parameter editing = 2'b01;
     parameter unclocked = 2'b10;
@@ -355,8 +378,8 @@ module system_logic (  // manages the overall logic of the lock, **it should be 
 vio_0 vio(
   .clk(clk),              // input wire clk
   .probe_in0(correct_pswd),  // input wire [15 : 0] probe_in0
-  .probe_in1(switches),  // input wire [3 : 0] probe_in1
-  .probe_in2(identity),  // input wire [1 : 0] probe_in2
+  .probe_in1(password),  // input wire [3 : 0] probe_in1
+  .probe_in2(time_of_error),  // input wire [1 : 0] probe_in2
   .probe_in3(tubes)      // input wire [6 : 0] probe_in3
 );
 
@@ -379,12 +402,18 @@ end
         .KIN  (admin_button),
         .KOUT (admin_temp)
     );
+     ERZP u_ERZP2(
+        .CLK  (clk),
+        .KIN  (ok_button),
+        .KOUT (ok_signal)
+    );
 
     password_reg pswd_reg( 
         .clk(clk),
         .identity(identity),
         .state(state),
         .edit_switch(edit_switch),
+        .time_of_error(time_of_error),
         .load(load_button),
         .one_digit(switches),
         .q(password),
@@ -395,20 +424,21 @@ end
     
     password_check pswd_check(
         .identity(identity),
-        .ok_signal(ok_button),
-        .q(password),
+        .ok_signal(ok_signal),
+        .password(password),
         .correct_pswd(correct_pswd),
         .result(check_result),
-        .LEDs(LEDs)
+        .LEDs(LEDs),
+        .time_of_error(time_of_error)
     );
-    counter count(
+/*     counter count(
         .error_signal(check_result),
         .count(time_of_error)
-    );
+    ); */
 
     timer timer_(
         .state(state),
-        .ok(ok_button),
+        .ok(ok_signal),
         .clk(clk),
         .pulse()
     );

@@ -138,7 +138,7 @@ OPTRACE "set parameters" START { }
 OPTRACE "set parameters" END { }
 OPTRACE "add files" START { }
   add_files -quiet D:/FPGA2/project_1/project_1.runs/synth_1/system_logic.dcp
-  read_ip -quiet d:/FPGA2/project_1/project_1.srcs/sources_1/ip/vio_0/vio_0.xci
+  read_ip -quiet D:/FPGA2/project_1/project_1.srcs/sources_1/ip/vio_0/vio_0.xci
 OPTRACE "read constraints: implementation" START { }
   read_xdc D:/FPGA2/lock1.xdc
 OPTRACE "read constraints: implementation" END { }
