@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2023.2 (win64) Build 4029153 Fri Oct 13 20:14:34 MDT 2023
-| Date         : Fri Aug 30 09:22:38 2024
+| Date         : Fri Aug 30 19:00:42 2024
 | Host         : honer running 64-bit major release  (build 9200)
 | Command      : report_utilization -file vio_0_utilization_synth.rpt -pb vio_0_utilization_synth.pb
 | Design       : vio_0
@@ -152,12 +152,12 @@ Warning! LUT value is adjusted to account for LUT combining.
 | Ref Name | Used | Functional Category |
 +----------+------+---------------------+
 | FDRE     |  457 |        Flop & Latch |
-| LUT6     |   98 |                 LUT |
-| LUT4     |   94 |                 LUT |
+| LUT6     |   99 |                 LUT |
+| LUT4     |   95 |                 LUT |
 | LUT3     |   21 |                 LUT |
-| LUT5     |   20 |                 LUT |
+| LUT5     |   19 |                 LUT |
 | MUXF7    |   16 |               MuxFx |
-| LUT2     |    5 |                 LUT |
+| LUT2     |    4 |                 LUT |
 | LUT1     |    3 |                 LUT |
 +----------+------+---------------------+
 

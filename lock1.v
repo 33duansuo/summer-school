@@ -1,26 +1,26 @@
 module ERZP (CLK, KIN,KOUT);
 input CLK, KIN; //工作时钟和输入信�??
 output KOUT; reg KOUT;
-reg [3:0] KH,KL; //定义对高电平和低电平脉宽计数之寄存器
+reg [7:0] KH,KL; //定义对高电平和低电平脉宽计数之寄存器
 always @(posedge CLK) begin
 if (!KIN) KL<=KL+1 ; //对键输入的低电平脉宽计数
-else KL<=4'b0000; end //若出现高电平, 则计数器清零
+else KL<=8'b00000000; end //若出现高电平, 则计数器清零
 always @(posedge CLK) begin
 if (KIN) KH<= KH+1; //同时对键输入的高电平脉宽计数
-else KH<=4'b0000; end //若出现高电平, 则计数器清零
-always @(posedge CLK) begin if (KH > 4'b1100) KOUT<=1'B1;//对高电平脉宽计数�??旦大�??12, 则输�??1 
-else if (KL > 4'b0111) KOUT<=1'B0; //对低电平脉宽计数若大�??7, 则输�??0
+else KH<=8'b00000000; end //若出现高电平, 则计数器清零
+always @(posedge CLK) begin
+     if (KH > 8'b00111111) KOUT<=1'B1;//对高电平脉宽计数�??旦大�??12, 则输�??1 
+else if (KL > 8'b00111000) KOUT<=1'B0; //对低电平脉宽计数若大�??7, 则输�??0
 end
 endmodule
 
 module password_reg(
     input clk,
     input identity,    // user'1' / admininstrator'0'  
-    input state,       // two states: '0': waiting, '1': editing 
-    input edit_switch, // toggle it before entering password 
     input load, // to load one digit (left-shift), posedge trigger
 	input[3:0] one_digit, // the one decimal digit you input
     input[1:0] time_of_error,
+    input[31:0]cnt_1s,
     output reg [15:0] q, // the shift reg that loads password
     output reg [15:0] new_pswd, // the new password you set,when"identity==0"
     output reg [6:0] tubesreg, // the tubes to display the first decimal digit
@@ -31,48 +31,48 @@ module password_reg(
 
     always @(posedge load)// posedge trigger to load one digit
     begin
-        if(left_shift==0 && one_digit<10)
-            left_shift <= 1;
+        if(left_shift==4'd0 && one_digit<4'd10)
+            left_shift <= 4'd1;
         
-        else if(left_shift==1 && one_digit<10)
-            left_shift <= 2;
+        else if(left_shift==4'd1 && one_digit<4'd10)
+            left_shift <= 4'd2;
 
         
-        else if(left_shift==2 && one_digit<10)
-            left_shift <= 3;
+        else if(left_shift==4'd2 && one_digit<4'd10)
+            left_shift <= 4'd3;
 
         
-        else if(left_shift==3 && one_digit<10)
-            left_shift <= 0;
+        else if(left_shift==4'd3 && one_digit<4'd10)
+            left_shift <= 4'd0;
         
-        else if(left_shift==3 && one_digit>=10)
-            left_shift <= 2;
+        else if(left_shift==4'd3 && one_digit>=4'd10)
+            left_shift <= 4'd2;
         
-        else if(left_shift==2 && one_digit>=10)
-            left_shift <= 1;
+        else if(left_shift==4'd2 && one_digit>=4'd10)
+            left_shift <= 4'd1;
         
-        else if(left_shift==1 && one_digit>=10)
-            left_shift <= 0;
+        else if(left_shift==4'd1 && one_digit>=4'd10)
+            left_shift <= 4'd0;
         
-        else if(left_shift==0 && one_digit>=10)
-            left_shift <= 3;
+        else if(left_shift==4'd0 && one_digit>=4'd10)
+            left_shift <= 4'd3;
     end
 
  always @(one_digit)//when one_digit changes, load it into the q reg
  begin
     if(identity==1) // user
     begin
-            if(left_shift==0)
-                q[3:0] <= one_digit;
+            if(left_shift==4'd0)
+                q[3:0] = one_digit;
             
-            else if(left_shift==1)    
-                q[7:4] <= one_digit;
+            else if(left_shift==4'd1)    
+                q[7:4] = one_digit;
                
-            else if(left_shift==2)    
-                q[11:8] <= one_digit;
+            else if(left_shift==4'd2)    
+                q[11:8] = one_digit;
                     
-            else if(left_shift==3)           
-                q[15:12] <= one_digit;
+            else if(left_shift==4'd3)           
+                q[15:12] = one_digit;
     end
 
     /*TODO
@@ -82,18 +82,18 @@ module password_reg(
     */
    else if(identity==0) //administrator
     begin
-            if(left_shift==0)
-                new_pswd[3:0] <= one_digit;
+            if(left_shift==4'd0)
+                new_pswd[3:0] = one_digit;
             else
-            if(left_shift==1)    
-                new_pswd[7:4] <= one_digit;
+            if(left_shift==4'd1)    
+                new_pswd[7:4] = one_digit;
             else    
-            if(left_shift==2)    
-                new_pswd[11:8] <= one_digit;
+            if(left_shift==4'd2)    
+                new_pswd[11:8] = one_digit;
             else        
-            if(left_shift==3)           
+            if(left_shift==4'd3)           
 
-                new_pswd[15:12] <= one_digit;
+                new_pswd[15:12] = one_digit;
     end 
  end
 
@@ -132,161 +132,248 @@ module password_reg(
             default : tubesreg <= 7'b1000_000;//7'b0111_111;
      endcase
   end
-    if(sel==8'b11111101)
-    begin
-    case(q[7:4])
-            4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
-            4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
-            4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
-            4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
-            4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
-            4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
-            4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
-            4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
-            4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
-            4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
-            default : tubesreg <= 7'b1000_000;//7'b0111_111;
-      endcase
-    end
+                if(sel==8'b11111101)
+                begin
+                        case(q[7:4])
+                                4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
+                                4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
+                                4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
+                                4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
+                                4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
+                                4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
+                                4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
+                                4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
+                                4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
+                                4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
+                                default : tubesreg <= 7'b1000_000;//7'b0111_111;
+                        endcase
+                end
 
-    if(sel==8'b11111011)
-    begin
-    case(q[11:8])
-    4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
-    4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
-    4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
-    4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
-    4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
-    4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
-    4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
-    4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
-    4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
-    4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
-    default : tubesreg <= 7'b1000_000;//7'b0111_111;
-    endcase
-    end
+                    if(sel==8'b11111011)
+                    begin
+                        case(q[11:8])
+                            4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
+                            4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
+                            4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
+                            4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
+                            4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
+                            4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
+                            4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
+                            4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
+                            4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
+                            4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
+                            default : tubesreg <= 7'b1000_000;//7'b0111_111;
+                        endcase
+                    end
 
 
-    if(sel==8'b11110111)
-    begin
-    case(q[15:12])
-    4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
-    4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
-    4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
-    4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
-    4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
-    4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
-    4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
-    4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
-    4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
-    4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
-    default : tubesreg <= 7'b1000_000;//7'b0111_111;
-    endcase
-    end
-    if(sel==8'b11101111)
-    begin
-      tubesreg <= 7'b1111_001;//user
-    end
-    if(sel==8'b11011111)
-    begin
-    case(time_of_error[1:0])
-    2'b00 : tubesreg <= 7'b1000_000;//7'b0111_111;//
-    2'b01 : tubesreg <= 7'b1111_001;//7'b0000_110;
-    2'b10 : tubesreg <= 7'b0100_100;//7'b1011_011;
-    2'b11 : tubesreg <= 7'b0110_000;//7'b1001_111;
-    default : tubesreg <= 7'b1000_000;//7'b0111_111;
-    endcase
-    end
+                        if(sel==8'b11110111)
+                        begin
+                                case(q[15:12])
+                                    4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
+                                    4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
+                                    4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
+                                    4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
+                                    4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
+                                    4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
+                                    4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
+                                    4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
+                                    4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
+                                    4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
+                                    default : tubesreg <= 7'b1000_000;//7'b0111_111;
+                                endcase
+                        end
+                            if(sel==8'b11101111)
+                            begin
+                            tubesreg <= 7'b1111_001;//user
+                            end
 
-    if(sel==8'b10111111||sel==8'b01111111)
-    begin
-      tubesreg <= 7'b1000_000;
-    end
- end
+                                if(sel==8'b11011111)
+                                begin
+                                case(time_of_error[1:0])
+                                2'b00 : tubesreg <= 7'b1000_000;//7'b0111_111;//
+                                2'b01 : tubesreg <= 7'b1111_001;//7'b0000_110;
+                                2'b10 : tubesreg <= 7'b0100_100;//7'b1011_011;
+                                2'b11 : tubesreg <= 7'b0110_000;//7'b1001_111;
+                                default : tubesreg <= 7'b1000_000;//7'b0111_111;
+                                endcase
+                                end
 
+                                if(sel==8'b10111111)
+                                    begin
+                                        case(cnt_1s)
+                                        32'd0 : tubesreg <= 7'b1000_000;
+                                        32'd1 : tubesreg <= 7'b1111_001;
+                                        32'd2 : tubesreg <= 7'b0100_100;//7'b1011_011;
+                                        32'd3 : tubesreg <= 7'b0110_000;//7'b1001_111;
+                                        32'd4 : tubesreg <= 7'b0011_001;//7'b1100_110;
+                                        32'd5 : tubesreg <= 7'b0010_010;//7'b1101_101;
+                                        32'd6 : tubesreg <= 7'b0000_010;//7'b1111_101;
+                                        32'd7 : tubesreg <= 7'b1111_000;//7'b0000_111;
+                                        32'd8 : tubesreg <= 7'b0000_000;//7'b1111_111;
+                                        32'd9 : tubesreg <= 7'b0010_000;//7'b1101_111;
+                                        32'd10 : tubesreg <= 7'b1000_000;
+                                        32'd11 : tubesreg <= 7'b1111_001;
+                                        32'd12 : tubesreg <= 7'b0100_100;//7'b1011_011;
+                                        32'd13 : tubesreg <= 7'b0110_000;//7'b1001_111;
+                                        32'd14 : tubesreg <= 7'b0011_001;//7'b1100_110;
+                                        32'd15 : tubesreg <= 7'b0010_010;//7'b1101_101;
+                                        32'd16 : tubesreg <= 7'b0000_010;//7'b1111_101;
+                                        32'd17 : tubesreg <= 7'b1111_000;//7'b0000_111;
+                                        32'd18 : tubesreg <= 7'b0000_000;//7'b1111_111;
+                                        32'd19 : tubesreg <= 7'b0010_000;//7'b1101_111;
+                                        default:tubesreg <= 7'b1000_000;
+                                        endcase
+                                    end
+                                    if(sel==8'b01111111)
+                                    begin
+                                        case(cnt_1s)
+                                        32'd10 : tubesreg <= 7'b1000_000;
+                                        32'd11 : tubesreg <= 7'b1000_000;
+                                        32'd12 : tubesreg <= 7'b1000_000;//7'b1011_011;
+                                        32'd13 : tubesreg <= 7'b1000_000;//7'b1001_111;
+                                        32'd14 : tubesreg <= 7'b1000_000;//7'b1100_110;
+                                        32'd15 : tubesreg <= 7'b1000_000;//7'b1101_101;
+                                        32'd16 : tubesreg <= 7'b1000_000;//7'b1111_101;
+                                        32'd17 : tubesreg <= 7'b1000_000;//7'b0000_111;
+                                        32'd18 : tubesreg <= 7'b1000_000;//7'b1111_111;
+                                        32'd19 : tubesreg <= 7'b1000_000;//7'b1101_111;
+                                        default:tubesreg <= 7'b1000_000;
+                                        endcase
+                                  end
+  end
     if(identity==0) // admin
-    begin
-    if(sel==8'b11111110)
-    begin
-    case(new_pswd[3:0])
-    4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
-    4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
-    4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
-    4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
-    4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
-    4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
-    4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
-    4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
-    4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
-    4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
-    default : tubesreg <= 7'b1000_000;//7'b0111_111;
-    endcase
-    end
-    if(sel==8'b11111101)
-    begin
-    case(new_pswd[7:4])
-    4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
-    4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
-    4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
-    4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
-    4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
-    4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
-    4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
-    4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
-    4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
-    4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
-    default : tubesreg <= 7'b1000_000;//7'b0111_111;
-    endcase
-    end
+     begin
+                    if(sel==8'b11111110)
+                    begin
+                        case(new_pswd[3:0])
+                            4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
+                            4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
+                            4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
+                            4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
+                            4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
+                            4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
+                            4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
+                            4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
+                            4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
+                            4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
+                            default : tubesreg <= 7'b1000_000;//7'b0111_111;
+                        endcase
+                    end
+                    if(sel==8'b11111101)
+                    begin
+                        case(new_pswd[7:4])
+                                4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
+                                4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
+                                4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
+                                4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
+                                4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
+                                4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
+                                4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
+                                4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
+                                4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
+                                4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
+                                default : tubesreg <= 7'b1000_000;//7'b0111_111;
+                        endcase
+                    end
 
-    if(sel==8'b11111011)
-    begin
-    case(new_pswd[11:8])
-    4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
-    4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
-    4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
-    4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
-    4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
-    4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
-    4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
-    4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
-    4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
-    4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
-    default : tubesreg <= 7'b1000_000;//7'b0111_111;
-    endcase
-    end
+                if(sel==8'b11111011)
+                begin
+                    case(new_pswd[11:8])
+                        4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
+                        4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
+                        4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
+                        4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
+                        4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
+                        4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
+                        4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
+                        4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
+                        4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
+                        4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
+                        default : tubesreg <= 7'b1000_000;//7'b0111_111;
+                    endcase
+                end
 
 
-    if(sel==8'b11110111)
-    begin
-    case(new_pswd[15:12])
-    4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
-    4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
-    4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
-    4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
-    4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
-    4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
-    4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
-    4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
-    4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
-    4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
-    default : tubesreg <= 7'b1000_000;//7'b0111_111;
-    endcase
-    end
-    if(sel==8'b11101111)
+                if(sel==8'b11110111)
+                begin
+                    case(new_pswd[15:12])
+                        4'b0000 : tubesreg <= 7'b1000_000;//7'b0111_111;//
+                        4'b0001 : tubesreg <= 7'b1111_001;//7'b0000_110;
+                        4'b0010 : tubesreg <= 7'b0100_100;//7'b1011_011;
+                        4'b0011 : tubesreg <= 7'b0110_000;//7'b1001_111;
+                        4'b0100 : tubesreg <= 7'b0011_001;//7'b1100_110;
+                        4'b0101 : tubesreg <= 7'b0010_010;//7'b1101_101;
+                        4'b0110 : tubesreg <= 7'b0000_010;//7'b1111_101;
+                        4'b0111 : tubesreg <= 7'b1111_000;//7'b0000_111;
+                        4'b1000 : tubesreg <= 7'b0000_000;//7'b1111_111;
+                        4'b1001 : tubesreg <= 7'b0010_000;//7'b1101_111;
+                        default : tubesreg <= 7'b1000_000;//7'b0111_111;
+                    endcase
+                end
+                if(sel==8'b11101111)
 
-    begin
+                begin
 
-    tubesreg <= 7'b1000_000;//admin
+                  tubesreg <= 7'b1000_000;//admin
 
-    end
+                end
 
-    if(sel==8'b11011111||sel==8'b10111111||sel==8'b01111111)
-    begin
-    tubesreg <= 7'b1000_000;
-    end
-    end
- end
+                    if(sel==8'b11011111)
+                    begin
+                        case(time_of_error[1:0])
+                            2'b00 : tubesreg <= 7'b1000_000;//7'b0111_111;//
+                            2'b01 : tubesreg <= 7'b1111_001;//7'b0000_110;
+                            2'b10 : tubesreg <= 7'b0100_100;//7'b1011_011;
+                            2'b11 : tubesreg <= 7'b0110_000;//7'b1001_111;
+                            default : tubesreg <= 7'b1000_000;//7'b0111_111;
+                        endcase
+                    end
+
+                    if(sel==8'b10111111)
+                        begin
+                            case(cnt_1s)
+                            32'd0 : tubesreg <= 7'b1000_000;
+                            32'd1 : tubesreg <= 7'b1111_001;
+                            32'd2 : tubesreg <= 7'b0100_100;//7'b1011_011;
+                            32'd3 : tubesreg <= 7'b0110_000;//7'b1001_111;
+                            32'd4 : tubesreg <= 7'b0011_001;//7'b1100_110;
+                            32'd5 : tubesreg <= 7'b0010_010;//7'b1101_101;
+                            32'd6 : tubesreg <= 7'b0000_010;//7'b1111_101;
+                            32'd7 : tubesreg <= 7'b1111_000;//7'b0000_111;
+                            32'd8 : tubesreg <= 7'b0000_000;//7'b1111_111;
+                            32'd9 : tubesreg <= 7'b0010_000;//7'b1101_111;
+                            32'd10 : tubesreg <= 7'b1000_000;
+                            32'd11 : tubesreg <= 7'b1111_001;
+                            32'd12 : tubesreg <= 7'b0100_100;//7'b1011_011;
+                            32'd13 : tubesreg <= 7'b0110_000;//7'b1001_111;
+                            32'd14 : tubesreg <= 7'b0011_001;//7'b1100_110;
+                            32'd15 : tubesreg <= 7'b0010_010;//7'b1101_101;
+                            32'd16 : tubesreg <= 7'b0000_010;//7'b1111_101;
+                            32'd17 : tubesreg <= 7'b1111_000;//7'b0000_111;
+                            32'd18 : tubesreg <= 7'b0000_000;//7'b1111_111;
+                            32'd19 : tubesreg <= 7'b0010_000;//7'b1101_111;
+                            default:tubesreg <= 7'b1000_000;
+                            endcase
+                        end
+                    if(sel==8'b01111111)
+                    begin
+                        case(cnt_1s)
+                        32'd10 : tubesreg <= 7'b1000_000;
+                        32'd11 : tubesreg <= 7'b1000_000;
+                        32'd12 : tubesreg <= 7'b1000_000;//7'b1011_011;
+                        32'd13 : tubesreg <= 7'b1000_000;//7'b1001_111;
+                        32'd14 : tubesreg <= 7'b1000_000;//7'b1100_110;
+                        32'd15 : tubesreg <= 7'b1000_000;//7'b1101_101;
+                        32'd16 : tubesreg <= 7'b1000_000;//7'b1111_101;
+                        32'd17 : tubesreg <= 7'b1000_000;//7'b0000_111;
+                        32'd18 : tubesreg <= 7'b1000_000;//7'b1111_111;
+                        32'd19 : tubesreg <= 7'b1000_000;//7'b1101_111;
+                        default:tubesreg <= 7'b1000_000;
+                        endcase
+                   end
+      end
+  end
 endmodule
 
 
@@ -348,7 +435,6 @@ endmodule
 module system_logic (  // manages the overall logic of the lock, **it should be the top module**
     input clk, // the clock signal
     input [3:0] switches, // represent a decimal 0~9
-    input edit_switch,    // when changed, break the waiting mode
     input load, // load one digit
     input ok_button,   // confirm button
     input admin_button,  // clear the alarm signal, posedge trigger
@@ -360,7 +446,9 @@ module system_logic (  // manages the overall logic of the lock, **it should be 
     wire[15:0] password;
     wire[15:0] correct_pswd;
     wire[6:0] tubes_temp;
+    wire[31:0] cnttemp;
     reg[1:0] state = 2'b00;
+    reg[1:0] next_state;
     wire check_result;
     wire[1:0] time_of_error;
     reg identity = 1'b1; // 0-admin, 1-user
@@ -377,8 +465,8 @@ vio_0 vio(
   .clk(clk),              // input wire clk
   .probe_in0(correct_pswd),  // input wire [15 : 0] probe_in0
   .probe_in1(password),  // input wire [3 : 0] probe_in1
-  .probe_in2(time_of_error),  // input wire [1 : 0] probe_in2
-  .probe_in3(tubes)      // input wire [6 : 0] probe_in3
+  .probe_in2(finished),  // input wire [1 : 0] probe_in2
+  .probe_in3(sel)      // input wire [6 : 0] probe_in3
 );
 
 always @ (posedge admin_temp) 
@@ -409,9 +497,8 @@ end
     password_reg pswd_reg( 
         .clk(clk),
         .identity(identity),
-        .state(state),
-        .edit_switch(edit_switch),
         .time_of_error(time_of_error),
+        .cnt_1s(cnttemp),
         .load(load_button),
         .one_digit(switches),
         .q(password),
@@ -419,6 +506,7 @@ end
         .tubesreg(tubes),
         .sel(sel)
     );
+    
     
     password_check pswd_check(
         .identity(identity),
@@ -440,22 +528,53 @@ end
     .switches     (switches),
     .load         (load_button),
     .admin_button (admin_temp),
+    .cnttemp       (cnttemp),
     .finished     (finished)
    );
    
+   state_indicate u_state_indicate(
+    .state (state),
+    .LEDs  (LEDs)
+   );
+   
 
-    /* state_indicate indicate(
-        .state(state),
-        .LEDs(LEDs)
-    ); */
-
-    /*TODO:
-    implement the logics
-    */
-    always @(edit_switch) begin
-        if (state == waiting) state = editing;
+   
+   always @(*) begin
+        next_state = state; // to avoid generating latch
+        if (state == waiting && switches[3] == 1) begin 
+            next_state = editing;
+        end
+        if (state == editing && finished == 1)begin // 10s no operation,back to waiting
+            next_state = waiting;
+        end
+        if (state == editing && check_result == 1) begin // when you entered the right password
+            next_state = unlocked;
+        end
+        if (state == unlocked && finished == 1) begin // 20s no operation,back to waiting
+            next_state = waiting;
+        end
+        if (state == editing && time_of_error == 2'd3) begin // when you entered wrong password 3 times
+            next_state = alarming;
+        end
+        if (state == alarming && admin_button == 0) begin
+            next_state = waiting;
+        end
+        if (state == unlocked && ok_signal == 0) begin
+            next_state = waiting;
+        end
     end
-    // to be completed...
+
+    always @(posedge clk or negedge admin_button) 
+    begin
+        if (admin_button == 0 && state == alarming) begin
+            state <= waiting;
+        end
+        else begin
+            state <= next_state;
+        end
+    end
+
+    assign state_out = state;
     
 
     
@@ -468,62 +587,85 @@ module timer (
     input [3:0]switches,
     input load,
     input admin_button,
-   // when the timing ends, given an postive pulse to the system_logic 
-    //output new_state //
+    output reg [31:0]cnttemp,
     output reg finished
 );
     parameter waiting = 2'b00;
     parameter editing = 2'b01;
     parameter unlocked = 2'b10;
     parameter alarming = 2'b11;
-reg [31:0] cnt_1ms;
-reg [31:0] cnt_1s;
-reg [31:0] cnt;
-always @(ok,switches,load,admin_button) 
-begin
-    cnt_1s<=0;
-end
+    reg [31:0] cnt_1ms;
+    reg [31:0] cnt;
+    reg [31:0] cnt_1s;
+    reg [3:0] lastone;
+    always @(cnt_1s)
+    begin
+        lastone=switches;        
+    end
 
-always @(posedge clk)
- begin
- if(cnt == 32'd49999)					   //计时�?
-		cnt_1ms <= cnt_1ms+1;							//清零计时
- else										//计时未到
-		cnt <= cnt + 1;					//继续计时
- end
+    always @(posedge clk)
+    begin
+        if(!load||!admin_button||!ok||lastone!=switches)
+        begin
+            cnt_1s<=0;
+            cnt_1ms<=0;
+        end
+    cnttemp = cnt_1s;
+    if(cnt == 32'd49999)					   //计时�?
+    begin
+            cnt_1ms <= cnt_1ms+1;
+            cnt<=0;							//清零计时
+    end
+    else										//计时未到
+            cnt <= cnt + 1;					//继续计时
 
- always @(cnt_1ms) 
- begin
- if(cnt_1ms == 32'd1000)					   //计时�?
-		cnt_1s <= cnt_1s+1;							//清零计时
- else										//计时未到
-		cnt_1ms <= cnt_1ms + 1;					//继续计时
-
-    if  (cnt_1s==32'd10&&state==editing)
-    finished <= 1'b1;
-    else if  (cnt_1s==32'd20&&state==unlocked)
-    finished <= 1'b1;
- end
-
-
-    /*TODO:
-    waiting/alarming: do nothing;
-    editing: set a 10s timing, then return to waiting mode;
-    unlocked: set a 20s timing, when timing ends or posedge ok, return to waiting mode;
-    */
+    if(cnt_1ms == 32'd1000)					   //计时�?)
+    begin
+            cnt_1s <= cnt_1s+1;
+            cnt_1ms<=0;							//清零计时
+    end
     
+        if  (cnt_1s==32'd10&&state==editing)
+         begin
+        finished = 1'b1;
+        cnt_1s = 32'd0;
+         end
+        else if  (cnt_1s==32'd20&&state==unlocked)
+        begin
+        finished = 1'b1;
+        cnt_1s=32'd0; 
+        end
+        if(state==waiting)
+        finished = 1'b0;
+    end
 endmodule
 
-/* module state_indicate ( // control the LEDs
+module state_indicate ( // control the LEDs
     //ports
     input[1:0] state,
-    //output[7:0] tubes,
-    output[3:0] LEDs 
+    
+    output reg [3:0] LEDs 
 );
     /*TODO:
-    unclocked: turn on all LEDs;
+    unlocked: turn on all LEDs;
     alarming:  all LEDs flashing;
     waiting:  turn on one LED;
     editing:  turn on two LEDs;
     */
-//endmodule */
+    parameter waiting = 2'b00;
+    parameter editing = 2'b01;
+    parameter unlocked = 2'b10;
+    parameter alarming = 2'b11;
+    parameter user = 1'b1;
+    parameter admin = 1'b0;
+    always @(*) begin
+        case (state)
+            waiting: LEDs = 4'b0001;
+            editing: LEDs = 4'b0011;
+            alarming: LEDs = 4'b0111;
+            unlocked: LEDs = 4'b1111;
+            default: LEDs = 4'b0000;
+        endcase
+    end
+
+endmodule

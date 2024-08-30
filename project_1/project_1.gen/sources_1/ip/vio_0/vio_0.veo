@@ -58,8 +58,8 @@ vio_0 your_instance_name (
   .clk(clk),              // input wire clk
   .probe_in0(probe_in0),  // input wire [15 : 0] probe_in0
   .probe_in1(probe_in1),  // input wire [15 : 0] probe_in1
-  .probe_in2(probe_in2),  // input wire [1 : 0] probe_in2
-  .probe_in3(probe_in3)  // input wire [6 : 0] probe_in3
+  .probe_in2(probe_in2),  // input wire [0 : 0] probe_in2
+  .probe_in3(probe_in3)  // input wire [7 : 0] probe_in3
 );
 // INST_TAG_END ------ End INSTANTIATION Template ---------
 

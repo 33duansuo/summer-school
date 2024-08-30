@@ -55,8 +55,8 @@ probe_in0,probe_in1,probe_in2,probe_in3
 input clk;
 input [15 : 0] probe_in0;
 input [15 : 0] probe_in1;
-input [1 : 0] probe_in2;
-input [6 : 0] probe_in3;
+input [0 : 0] probe_in2;
+input [7 : 0] probe_in3;
 
 
 

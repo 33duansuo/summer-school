@@ -56,8 +56,8 @@ COMPONENT vio_0
     clk : IN STD_LOGIC;
     probe_in0 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
     probe_in1 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-    probe_in2 : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-    probe_in3 : IN STD_LOGIC_VECTOR(6 DOWNTO 0) 
+    probe_in2 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    probe_in3 : IN STD_LOGIC_VECTOR(7 DOWNTO 0) 
   );
 END COMPONENT;
 -- COMP_TAG_END ------ End COMPONENT Declaration ------------
