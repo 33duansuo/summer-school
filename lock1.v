@@ -29,7 +29,7 @@ module password_reg(
     reg [3:0]left_shift;
     reg[31:0] cnt_1ms;
 
-    always @(posedge load)// posedge trigger to load one digit
+    always @(negedge load)// posedge trigger to load one digit
     begin
         if(left_shift==4'd0 && one_digit<4'd10)
             left_shift <= 4'd1;
@@ -73,6 +73,8 @@ module password_reg(
                     
             else if(left_shift==4'd3)           
                 q[15:12] = one_digit;
+            else
+                q=q;
     end
 
     /*TODO
@@ -94,6 +96,8 @@ module password_reg(
             if(left_shift==4'd3)           
 
                 new_pswd[15:12] = one_digit;
+            else
+                new_pswd=new_pswd;
     end 
  end
 
@@ -228,16 +232,16 @@ module password_reg(
                                     if(sel==8'b01111111)
                                     begin
                                         case(cnt_1s)
-                                        32'd10 : tubesreg <= 7'b1000_000;
-                                        32'd11 : tubesreg <= 7'b1000_000;
-                                        32'd12 : tubesreg <= 7'b1000_000;//7'b1011_011;
-                                        32'd13 : tubesreg <= 7'b1000_000;//7'b1001_111;
-                                        32'd14 : tubesreg <= 7'b1000_000;//7'b1100_110;
-                                        32'd15 : tubesreg <= 7'b1000_000;//7'b1101_101;
-                                        32'd16 : tubesreg <= 7'b1000_000;//7'b1111_101;
-                                        32'd17 : tubesreg <= 7'b1000_000;//7'b0000_111;
-                                        32'd18 : tubesreg <= 7'b1000_000;//7'b1111_111;
-                                        32'd19 : tubesreg <= 7'b1000_000;//7'b1101_111;
+                                        32'd10 : tubesreg <= 7'b1111_001;
+                                        32'd11 : tubesreg <= 7'b1111_001;
+                                        32'd12 : tubesreg <= 7'b1111_001;//7'b1011_011;
+                                        32'd13 : tubesreg <= 7'b1111_001;//7'b1001_111;
+                                        32'd14 : tubesreg <= 7'b1111_001;//7'b1100_110;
+                                        32'd15 : tubesreg <= 7'b1111_001;//7'b1101_101;
+                                        32'd16 : tubesreg <= 7'b1111_001;//7'b1111_101;
+                                        32'd17 : tubesreg <= 7'b1111_001;//7'b0000_111;
+                                        32'd18 : tubesreg <= 7'b1111_001;//7'b1111_111;
+                                        32'd19 : tubesreg <= 7'b1111_001;//7'b1101_111;
                                         default:tubesreg <= 7'b1000_000;
                                         endcase
                                   end
@@ -359,16 +363,16 @@ module password_reg(
                     if(sel==8'b01111111)
                     begin
                         case(cnt_1s)
-                        32'd10 : tubesreg <= 7'b1000_000;
-                        32'd11 : tubesreg <= 7'b1000_000;
-                        32'd12 : tubesreg <= 7'b1000_000;//7'b1011_011;
-                        32'd13 : tubesreg <= 7'b1000_000;//7'b1001_111;
-                        32'd14 : tubesreg <= 7'b1000_000;//7'b1100_110;
-                        32'd15 : tubesreg <= 7'b1000_000;//7'b1101_101;
-                        32'd16 : tubesreg <= 7'b1000_000;//7'b1111_101;
-                        32'd17 : tubesreg <= 7'b1000_000;//7'b0000_111;
-                        32'd18 : tubesreg <= 7'b1000_000;//7'b1111_111;
-                        32'd19 : tubesreg <= 7'b1000_000;//7'b1101_111;
+                        32'd10 : tubesreg <= 7'b1111_001;
+                        32'd11 : tubesreg <= 7'b1111_001;
+                        32'd12 : tubesreg <= 7'b1111_001;//7'b1011_011;
+                        32'd13 : tubesreg <= 7'b1111_001;//7'b1001_111;
+                        32'd14 : tubesreg <= 7'b1111_001;//7'b1100_110;
+                        32'd15 : tubesreg <= 7'b1111_001;//7'b1101_101;
+                        32'd16 : tubesreg <= 7'b1111_001;//7'b1111_101;
+                        32'd17 : tubesreg <= 7'b1111_001;//7'b0000_111;
+                        32'd18 : tubesreg <= 7'b1111_001;//7'b1111_111;
+                        32'd19 : tubesreg <= 7'b1111_001;//7'b1101_111;
                         default:tubesreg <= 7'b1000_000;
                         endcase
                    end
@@ -387,7 +391,7 @@ module password_check (
     output reg result, // '1': right '0': wrongs
     output reg [1:0]time_of_error 
 );
- always @(posedge ok_signal) 
+ always @(negedge ok_signal) 
  begin
   if (password==correct_pswd && identity==1) // user
   begin
@@ -399,6 +403,7 @@ module password_check (
     result <= 1'b0; // wrong
     time_of_error <= time_of_error+2'b01; // error happened
   end
+
   else if (identity==0) // admin
   begin
     time_of_error <= 2'b00; // no error
@@ -455,19 +460,13 @@ module system_logic (  // manages the overall logic of the lock, **it should be 
     wire load_button;
     wire admin_temp;
     wire ok_signal;
+    wire key;
     parameter waiting = 2'b00;
     parameter editing = 2'b01;
     parameter unlocked = 2'b10;
     parameter alarming = 2'b11;
     parameter user = 1'b1;
     parameter admin = 1'b0;
-vio_0 vio(
-  .clk(clk),              // input wire clk
-  .probe_in0(correct_pswd),  // input wire [15 : 0] probe_in0
-  .probe_in1(password),  // input wire [3 : 0] probe_in1
-  .probe_in2(finished),  // input wire [1 : 0] probe_in2
-  .probe_in3(sel)      // input wire [6 : 0] probe_in3
-);
 
 always @ (posedge admin_temp) 
 begin
@@ -492,6 +491,11 @@ end
         .CLK  (clk),
         .KIN  (ok_button),
         .KOUT (ok_signal)
+    );
+     ERZP u_ERZP3(
+        .CLK  (clk),
+        .KIN  (key_button),
+        .KOUT (key)
     );
 
     password_reg pswd_reg( 
@@ -528,7 +532,8 @@ end
     .switches     (switches),
     .load         (load_button),
     .admin_button (admin_temp),
-    .cnttemp       (cnttemp),
+    .key          (key),
+    .cnttemp      (cnttemp),
     .finished     (finished)
    );
    
@@ -536,12 +541,10 @@ end
     .state (state),
     .LEDs  (LEDs)
    );
-   
 
-   
-   always @(*) begin
+   always @(posedge clk) begin
         next_state = state; // to avoid generating latch
-        if (state == waiting && switches[3] == 1) begin 
+        if (state == waiting &&(!key_button||!load)) begin 
             next_state = editing;
         end
         if (state == editing && finished == 1)begin // 10s no operation,back to waiting
@@ -556,22 +559,20 @@ end
         if (state == editing && time_of_error == 2'd3) begin // when you entered wrong password 3 times
             next_state = alarming;
         end
-        if (state == alarming && admin_button == 0) begin
+        if (state == alarming && !admin_button ) begin
             next_state = waiting;
         end
-        if (state == unlocked && ok_signal == 0) begin
+        if (state == unlocked && !key_button ) begin
             next_state = waiting;
         end
     end
 
-    always @(posedge clk or negedge admin_button) 
+    always @(posedge clk) 
     begin
-        if (admin_button == 0 && state == alarming) begin
-            state <= waiting;
-        end
-        else begin
+      
+     
             state <= next_state;
-        end
+        
     end
 
     assign state_out = state;
@@ -586,6 +587,7 @@ module timer (
     input clk,      // a standard square wave signal
     input [3:0]switches,
     input load,
+    input key,
     input admin_button,
     output reg [31:0]cnttemp,
     output reg finished
@@ -598,14 +600,14 @@ module timer (
     reg [31:0] cnt;
     reg [31:0] cnt_1s;
     reg [3:0] lastone;
-    always @(cnt_1s)
+    always @(negedge clk) 
     begin
-        lastone=switches;        
+     lastone=switches;   
     end
 
     always @(posedge clk)
     begin
-        if(!load||!admin_button||!ok||lastone!=switches)
+        if(!key||!load||!admin_button||!ok||lastone!=switches)
         begin
             cnt_1s<=0;
             cnt_1ms<=0;
@@ -627,16 +629,16 @@ module timer (
     
         if  (cnt_1s==32'd10&&state==editing)
          begin
-        finished = 1'b1;
-        cnt_1s = 32'd0;
+        finished <= 1'b1;
+        cnt_1s <= 32'd0;
          end
         else if  (cnt_1s==32'd20&&state==unlocked)
         begin
-        finished = 1'b1;
-        cnt_1s=32'd0; 
+        finished <= 1'b1;
+        cnt_1s<=32'd0; 
         end
         if(state==waiting)
-        finished = 1'b0;
+        finished <= 1'b0;
     end
 endmodule
 

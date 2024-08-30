@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="impl_1" LaunchPart="xc7a75tfgg484-2" LaunchTime="1725019493">
+<GenRun Id="impl_1" LaunchPart="xc7a75tfgg484-2" LaunchTime="1725034426">
   <File Type="ROUTE-PWR" Name="system_logic_power_routed.rpt"/>
   <File Type="PA-TCL" Name="system_logic.tcl"/>
   <File Type="ROUTE-PWR-SUM" Name="system_logic_power_summary_routed.pb"/>
@@ -137,5 +137,4 @@
     <Step Id="post_route_phys_opt_design"/>
     <Step Id="write_bitstream"/>
   </Strategy>
-  <BlockFileSet Type="BlockSrcs" Name="vio_0"/>
 </GenRun>
