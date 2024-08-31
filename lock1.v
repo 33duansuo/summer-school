@@ -544,13 +544,13 @@ end
 
    always @(posedge clk) begin
         next_state = state; // to avoid generating latch
-        if (state == waiting &&(!key_button||!load)) begin 
+        if (state == waiting &&(!load||(switches[3]&&switches[2]))) begin 
             next_state = editing;
         end
         if (state == editing && finished == 1)begin // 10s no operation,back to waiting
             next_state = waiting;
         end
-        if (state == editing && check_result == 1) begin // when you entered the right password
+        if (state == editing && check_result == 1&&!ok_signal) begin // when you entered the right password
             next_state = unlocked;
         end
         if (state == unlocked && finished == 1) begin // 20s no operation,back to waiting

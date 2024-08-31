@@ -1,6 +1,12 @@
 #CLK
 create_clock -period 20.000 [get_ports clk]
 #IO
+set_property CFGBVS VCCO [current_design]
+set_property CONFIG_VOLTAGE 3.3 [current_design]
+set_property BITSTREAM.GENERAL.COMPRESS true [current_design]
+set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design]
+set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 4 [current_design]
+set_property BITSTREAM.CONFIG.SPI_FALL_EDGE Yes [current_design]
 set_property PACKAGE_PIN Y18 [get_ports clk]
 set_property PACKAGE_PIN AB18 [get_ports {tubes[0]}]
 set_property PACKAGE_PIN U17 [get_ports {tubes[1]}]

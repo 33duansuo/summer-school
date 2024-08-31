@@ -1,0 +1,14 @@
+===================================
+Configuration Memory information
+===================================
+File Format        MCS
+Interface          SPIX4
+Size               2M
+Start Address      0x00000000
+End Address        0x001FFFFF
+Checksum           0x181E4DA7
+Fill Value         0xFF
+
+Addr1         Addr2         Date                    File(s)                                                      Checksum
+0x00000000    0x00080F2F    Aug 31 09:19:33 2024    D:/FPGA2/project_1/project_1.runs/impl_1/system_logic.bit    0x00456E77
+File Checksum Total                                                                                              0x00456E77
