@@ -9,8 +9,8 @@ always @(posedge CLK) begin
 if (KIN) KH<= KH+1; //同时对键输入的高电平脉宽计数
 else KH<=8'b00000000; end //若出现高电平, 则计数器清零
 always @(posedge CLK) begin
-     if (KH > 8'b00111111) KOUT<=1'B1;//对高电平脉宽计数�??旦大�??12, 则输�??1 
-else if (KL > 8'b00111000) KOUT<=1'B0; //对低电平脉宽计数若大�??7, 则输�??0
+     if (KH > 8'b01111111) KOUT<=1'B1;//对高电平脉宽计数�??旦大�??12, 则输�??1 
+else if (KL > 8'b01111000) KOUT<=1'B0; //对低电平脉宽计数若大�??7, 则输�??0
 end
 endmodule
 
@@ -21,6 +21,7 @@ module password_reg(
 	input[3:0] one_digit, // the one decimal digit you input
     input[1:0] time_of_error,
     input[31:0]cnt_1s,
+    input ok,
     output reg [15:0] q, // the shift reg that loads password
     output reg [15:0] new_pswd, // the new password you set,when"identity==0"
     output reg [6:0] tubesreg, // the tubes to display the first decimal digit
@@ -28,78 +29,46 @@ module password_reg(
     );
     reg [3:0]left_shift;
     reg[31:0] cnt_1ms;
+    reg[1:0]load_cnt;
+    reg load_signal;
 
-    always @(negedge load)// posedge trigger to load one digit
-    begin
-        if(left_shift==4'd0 && one_digit<4'd10)
-            left_shift <= 4'd1;
-        
-        else if(left_shift==4'd1 && one_digit<4'd10)
-            left_shift <= 4'd2;
+   always @(negedge load) begin
+        if(load_cnt == 2'b10) begin
+            load_cnt <= 2'b00;
+            load_signal <= 1'b1;
+        end
+        else begin
+            load_cnt <= load_cnt + 1;
+            load_signal <= 1'b0;
+        end
 
-        
-        else if(left_shift==4'd2 && one_digit<4'd10)
-            left_shift <= 4'd3;
+        if (identity == 1) begin //user
+            if (one_digit < 4'd10&&load_signal) begin
+                q <= {q[11:0],one_digit};
+            end 
+             else if(one_digit > 4'd10&&load_signal)
+            begin
+                new_pswd <= {4'b0000,new_pswd[15:4]};
+            end
+            else begin
+                 new_pswd<=new_pswd;
+            end
 
-        
-        else if(left_shift==4'd3 && one_digit<4'd10)
-            left_shift <= 4'd0;
-        
-        else if(left_shift==4'd3 && one_digit>=4'd10)
-            left_shift <= 4'd2;
-        
-        else if(left_shift==4'd2 && one_digit>=4'd10)
-            left_shift <= 4'd1;
-        
-        else if(left_shift==4'd1 && one_digit>=4'd10)
-            left_shift <= 4'd0;
-        
-        else if(left_shift==4'd0 && one_digit>=4'd10)
-            left_shift <= 4'd3;
+
+        end
+        else begin //administrator
+            if (one_digit < 4'd10&&load_signal) begin
+                new_pswd <= {new_pswd[11:0],one_digit};
+            end 
+            else if(one_digit > 4'd10&&load_signal)
+            begin
+                new_pswd <= {4'b0000,new_pswd[15:4]};
+            end
+            else begin
+                 new_pswd<=new_pswd;
+            end
+           end
     end
-
- always @(one_digit)//when one_digit changes, load it into the q reg
- begin
-    if(identity==1) // user
-    begin
-            if(left_shift==4'd0)
-                q[3:0] = one_digit;
-            
-            else if(left_shift==4'd1)    
-                q[7:4] = one_digit;
-               
-            else if(left_shift==4'd2)    
-                q[11:8] = one_digit;
-                    
-            else if(left_shift==4'd3)           
-                q[15:12] = one_digit;
-            else
-                q=q;
-    end
-
-    /*TODO
-    implement a shift register;
-    always @(mode_switch) state = 1;
-    assign ok_signal = ok;  // inform the system logic to proceed to password check
-    */
-   else if(identity==0) //administrator
-    begin
-            if(left_shift==4'd0)
-                new_pswd[3:0] = one_digit;
-            else
-            if(left_shift==4'd1)    
-                new_pswd[7:4] = one_digit;
-            else    
-            if(left_shift==4'd2)    
-                new_pswd[11:8] = one_digit;
-            else        
-            if(left_shift==4'd3)           
-
-                new_pswd[15:12] = one_digit;
-            else
-                new_pswd=new_pswd;
-    end 
- end
 
  always @(posedge clk)
  begin
@@ -505,6 +474,7 @@ end
         .cnt_1s(cnttemp),
         .load(load_button),
         .one_digit(switches),
+        .ok(key),
         .q(password),
         .new_pswd(correct_pswd),
         .tubesreg(tubes),
@@ -559,7 +529,7 @@ end
         if (state == editing && time_of_error == 2'd3) begin // when you entered wrong password 3 times
             next_state = alarming;
         end
-        if (state == alarming && !admin_button ) begin
+        if (state == alarming && !ok_signal &&!identity ) begin
             next_state = waiting;
         end
         if (state == unlocked && !key_button ) begin

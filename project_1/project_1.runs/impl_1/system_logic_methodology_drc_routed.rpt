@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2023.2 (win64) Build 4029153 Fri Oct 13 20:14:34 MDT 2023
-| Date         : Sat Aug 31 09:19:21 2024
+| Date         : Tue Sep  3 12:25:18 2024
 | Host         : honer running 64-bit major release  (build 9200)
 | Command      : report_methodology -file system_logic_methodology_drc_routed.rpt -pb system_logic_methodology_drc_routed.pb -rpx system_logic_methodology_drc_routed.rpx
 | Design       : system_logic
@@ -24,14 +24,12 @@ Table of Contents
       Design limits: <entire design considered>
              Max violations: <unlimited>
              Violations found: 66
-+-----------+------------------+--------------------------------+------------+
-| Rule      | Severity         | Description                    | Violations |
-+-----------+------------------+--------------------------------+------------+
-| TIMING-17 | Critical Warning | Non-clocked sequential cell    | 6          |
-| TIMING-18 | Warning          | Missing input or output delay  | 27         |
-| TIMING-20 | Warning          | Non-clocked latch              | 32         |
-| LATCH-1   | Advisory         | Existing latches in the design | 1          |
-+-----------+------------------+--------------------------------+------------+
++-----------+------------------+-------------------------------+------------+
+| Rule      | Severity         | Description                   | Violations |
++-----------+------------------+-------------------------------+------------+
+| TIMING-17 | Critical Warning | Non-clocked sequential cell   | 39         |
+| TIMING-18 | Warning          | Missing input or output delay | 27         |
++-----------+------------------+-------------------------------+------------+
 
 2. REPORT DETAILS
 -----------------
@@ -57,12 +55,177 @@ Related violations: <none>
 
 TIMING-17#5 Critical Warning
 Non-clocked sequential cell  
-The clock pin pswd_reg/left_shift_reg[0]/C is not reached by a timing clock
+The clock pin pswd_reg/load_cnt_reg[0]/C is not reached by a timing clock
 Related violations: <none>
 
 TIMING-17#6 Critical Warning
 Non-clocked sequential cell  
-The clock pin pswd_reg/left_shift_reg[1]/C is not reached by a timing clock
+The clock pin pswd_reg/load_cnt_reg[1]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#7 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/load_signal_reg/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#8 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[0]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#9 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[10]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#10 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[11]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#11 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[12]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#12 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[13]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#13 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[14]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#14 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[15]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#15 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[1]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#16 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[2]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#17 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[3]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#18 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[4]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#19 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[5]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#20 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[6]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#21 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[7]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#22 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[8]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#23 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/new_pswd_reg[9]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#24 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[0]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#25 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[10]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#26 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[11]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#27 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[12]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#28 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[13]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#29 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[14]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#30 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[15]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#31 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[1]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#32 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[2]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#33 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[3]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#34 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[4]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#35 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[5]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#36 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[6]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#37 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[7]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#38 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[8]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#39 Critical Warning
+Non-clocked sequential cell  
+The clock pin pswd_reg/q_reg[9]/C is not reached by a timing clock
 Related violations: <none>
 
 TIMING-18#1 Warning
@@ -198,171 +361,6 @@ Related violations: <none>
 TIMING-18#27 Warning
 Missing input or output delay  
 An output delay is missing on tubes[6] relative to the rising and/or falling clock edge(s) of clk.
-Related violations: <none>
-
-TIMING-20#1 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[0] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[0]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#2 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[10] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[10]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#3 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[11] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[11]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#4 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[12] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[12]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#5 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[13] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[13]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#6 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[14] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[14]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#7 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[15] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[15]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#8 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[1] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[1]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#9 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[2] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[2]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#10 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[3] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[3]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#11 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[4] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[4]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#12 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[5] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[5]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#13 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[6] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[6]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#14 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[7] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[7]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#15 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[8] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[8]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#16 Warning
-Non-clocked latch  
-The latch pswd_reg/new_pswd_reg[9] cannot be properly analyzed as its control pin pswd_reg/new_pswd_reg[9]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#17 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[0] cannot be properly analyzed as its control pin pswd_reg/q_reg[0]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#18 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[10] cannot be properly analyzed as its control pin pswd_reg/q_reg[10]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#19 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[11] cannot be properly analyzed as its control pin pswd_reg/q_reg[11]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#20 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[12] cannot be properly analyzed as its control pin pswd_reg/q_reg[12]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#21 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[13] cannot be properly analyzed as its control pin pswd_reg/q_reg[13]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#22 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[14] cannot be properly analyzed as its control pin pswd_reg/q_reg[14]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#23 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[15] cannot be properly analyzed as its control pin pswd_reg/q_reg[15]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#24 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[1] cannot be properly analyzed as its control pin pswd_reg/q_reg[1]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#25 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[2] cannot be properly analyzed as its control pin pswd_reg/q_reg[2]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#26 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[3] cannot be properly analyzed as its control pin pswd_reg/q_reg[3]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#27 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[4] cannot be properly analyzed as its control pin pswd_reg/q_reg[4]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#28 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[5] cannot be properly analyzed as its control pin pswd_reg/q_reg[5]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#29 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[6] cannot be properly analyzed as its control pin pswd_reg/q_reg[6]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#30 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[7] cannot be properly analyzed as its control pin pswd_reg/q_reg[7]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#31 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[8] cannot be properly analyzed as its control pin pswd_reg/q_reg[8]/G is not reached by a timing clock
-Related violations: <none>
-
-TIMING-20#32 Warning
-Non-clocked latch  
-The latch pswd_reg/q_reg[9] cannot be properly analyzed as its control pin pswd_reg/q_reg[9]/G is not reached by a timing clock
-Related violations: <none>
-
-LATCH-1#1 Advisory
-Existing latches in the design  
-There are 32 latches found in the design. Inferred latches are often the result of HDL coding mistakes, such as incomplete if or case statements.
 Related violations: <none>
 
 
